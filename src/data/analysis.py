@@ -1,3 +1,4 @@
+import os
 from matplotlib.gridspec import GridSpec, GridSpecFromSubplotSpec
 import pandas as pd
 import numpy as np
@@ -5,6 +6,7 @@ from pathlib import Path
 import imagesize
 import matplotlib.pyplot as plt
 from PIL import Image
+from IPython.display import clear_output
 
 import data
 
@@ -122,7 +124,6 @@ def format_axes(fig: plt.Figure):
     for ax in fig.axes:
         ax.set_xticks([])
         ax.set_yticks([])
-        # ax.grid(False)
         ax.set_aspect(1)
 
 
@@ -131,7 +132,7 @@ def display_img_per_category(nb_img: int, datadir: str, df: pd.DataFrame, nb_lim
 
     img_dir = get_img_dir(datadir)
 
-    fig = plt.figure(figsize=(20, 24), layout="constrained")
+    fig = plt.figure(figsize=(20, 20), layout="constrained")
     rows, cols = get_rows_cols(nb_limit_categories)
     gs_cat = GridSpec(rows, cols, figure=fig)
     # gs_cat.tight_layout(fig)
@@ -156,3 +157,52 @@ def display_img_per_category(nb_img: int, datadir: str, df: pd.DataFrame, nb_lim
     format_axes(fig)
     fig.suptitle(f"{nb_img} images aléatoires de chaque catégorie")
     plt.show()
+
+
+def display_random_img_per_category(prdtypecode: int, nb_img: int, datadir: str, df: pd.DataFrame):
+    images_per_cat = get_img_per_category(nb_img, df)
+    images_to_display = [
+        imagename for imagename in images_per_cat[images_per_cat["prdtypecode"] == prdtypecode]["imagename"]]
+
+    rows, cols = get_rows_cols(max_col=5, nb_items=nb_img)
+
+    fig = plt.figure(figsize=(10*rows, 7*cols))
+    for i, image in enumerate(images_to_display):
+        img = np.asarray(Image.open(get_img_dir(datadir) + image))
+        ax = fig.add_subplot(rows, cols, i + 1)
+        ax.imshow(img)
+
+    format_axes(fig)
+    plt.show()
+
+
+def has_white_bands(nb_pixels: int, img: np.array) -> bool:
+    top_is_white = img[:nb_pixels].mean() == 255
+    bottom_is_white = img[-nb_pixels:].mean() == 255
+    left_is_white = img[:, :nb_pixels].mean() == 255
+    right_is_white = img[:, -nb_pixels:].mean() == 255
+
+    return top_is_white or bottom_is_white or left_is_white or right_is_white
+
+
+def read_check_image(nb_pixels: int, filename: str, datadir: str, i: int, i_total: int):
+    i += 1
+    img = np.asarray(Image.open(get_img_dir(datadir) + filename))
+    if (i % 500 == 0):
+        clear_output(wait=True)
+        print("Avancement du traitement :",
+              np.round(i / i_total * 100, 2), "%")
+    return has_white_bands(nb_pixels, img)
+
+
+def img_with_white_stripes(nb_pixels: int, datadir: str, img_filenames: pd.Series) -> list:
+    i_total = img_filenames.count()
+    result = [read_check_image(nb_pixels, filename, datadir, i, i_total)
+              for i, filename in enumerate(img_filenames)]
+    clear_output(wait=True)
+    return result
+
+# Debug, will be removed in the next commit
+# datadir = "data"
+# df = data.load_data(datadir)
+# df_image = get_img_information(datadir)
