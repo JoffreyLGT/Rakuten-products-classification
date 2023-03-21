@@ -1,2 +1,7 @@
 # exclude env folder
 /.conda/*
+**/__pycache__
+# exclude the decompressed images
+/data
+# exclude MAC OS specific files
+**/.DS_Store
