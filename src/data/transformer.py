@@ -1,9 +1,10 @@
 from html.parser import HTMLParser
+import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
 class HTMLRemover(BaseEstimator, TransformerMixin):
-    """"
+    """
     Transformer removing HTML tags and decoding HTML special characters.
     """
 
@@ -17,12 +18,15 @@ class HTMLRemover(BaseEstimator, TransformerMixin):
     def _parseColumn(self, column):
         return [self._parseValue(value) for value in column]
 
-    def fit(self, X, y):
+    def fit(self, X, y=None):
         # Do nothing, mandatory function for when a model is provided to the pipeline.
         return self
 
     def transform(self, X):
-        return X.apply(lambda column: self._parseColumn(column))
+        if type(X) == pd.DataFrame:
+            return X.apply(lambda column: self._parseColumn(column))
+
+        return X.apply(lambda column: self._parseValue(column))
 
 
 class _RakutenHTMLParser(HTMLParser):
