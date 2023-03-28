@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 import nltk
 
@@ -13,6 +14,49 @@ try:
 except:
     nltk.download('stopwords')
     from nltk.corpus import stopwords
+
+from nltk.stem.snowball import SnowballStemmer
+
+class StemmedCountVectorizer(CountVectorizer):
+    fr_stemmer = SnowballStemmer('french')
+    
+    def build_analyzer(self):
+        analyzer = super(StemmedTfidfVectorizer, self).build_analyzer()
+        return lambda doc: (StemmedTfidfVectorizer.en_stemmer.stem(w) for w in analyzer(doc))
+
+class StemmedTfidfVectorizer(TfidfVectorizer):
+    fr_stemmer = SnowballStemmer('french')
+    
+    def build_analyzer(self):
+        analyzer = super(StemmedTfidfVectorizer, self).build_analyzer()
+        return lambda doc: (StemmedTfidfVectorizer.en_stemmer.stem(w) for w in analyzer(doc))
+
+
+class BOW_Stemming(Pipeline):
+    ''' Bag of Words with french stemming '''
+    def __init__(self):
+        self.name = 'BOW_Stemming'
+        steps = [
+            ('remove_html', HTMLRemover()),
+            ('count', StemmedCountVectorizer())
+        ]
+        Pipeline.__init__(self, steps)
+
+    def get_voc(self):
+        return self.steps[1][1].vocabulary_
+
+class TfidfStemming(Pipeline):
+    def __init__(self):
+        self.name = 'TfidfStemming'
+        steps = [
+            ('remove_html', HTMLRemover()),
+            ('tfidStem', StemmedTfidfVectorizer())
+        ]
+        Pipeline.__init__(self, steps)
+
+    def get_voc(self):
+        return self.steps[1][1].vocabulary_
+
 
 
 class BagOfWordsDefault(Pipeline):
