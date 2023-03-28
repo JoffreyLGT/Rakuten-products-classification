@@ -3,3 +3,4 @@ matplotlib==3.4.2
 nltk
 scikit-learn
 opencv
+imagesize
