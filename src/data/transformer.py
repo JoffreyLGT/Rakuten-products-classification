@@ -46,7 +46,7 @@ class NumRemover(BaseEstimator, TransformerMixin):
     def _parseValue(self, value):
         if type(value) != str:
             return value        
-        value = re.sub('[0-9]+', '', value)
+        value = re.sub('\s?([0-9]+)\s?', ' ', value)
         return value
 
     def _parseColumn(self, column):
