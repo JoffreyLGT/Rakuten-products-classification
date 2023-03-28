@@ -6,7 +6,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 import nltk
 
-from src.data.transformer import HTMLRemover
+from src.data.transformer import HTMLRemover, NumRemover
 
 try:
     from nltk.corpus import stopwords
@@ -72,6 +72,7 @@ class TfidfV1(Pipeline):
 
         steps = [
             ('remove_html', HTMLRemover()),
+            ('remove_num', NumRemover()),
             ('count', CountVectorizer(**self.preproc_config_CountVect)),
             ('tfid', TfidfTransformer(**self.preproc_config_TfidfVect))
         ]
