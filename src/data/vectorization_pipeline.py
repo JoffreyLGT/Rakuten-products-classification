@@ -17,6 +17,8 @@ except:
 
 from nltk.stem.snowball import SnowballStemmer
 
+from src.commun.setup_logger import logger
+
 class BagOfWordsDefault(Pipeline):
     def __init__(self):
         self.name = 'BagOfWordsDefault'
@@ -26,6 +28,7 @@ class BagOfWordsDefault(Pipeline):
             ('count', CountVectorizer())
         ]
         Pipeline.__init__(self, steps)
+        logger.info('class:BagOfWordsDefault')
 
     def get_voc(self):
         countvect_pos = [k for k, _ in self.steps].index('count') 
@@ -42,6 +45,7 @@ class TfidfDefault(Pipeline):
             ('tfid', TfidfTransformer())
         ]
         Pipeline.__init__(self, steps)
+        logger.info('class:TfidfDefault')
 
     def get_voc(self):
         countvect_pos = [k for k, _ in self.steps].index('count') 
@@ -83,6 +87,7 @@ class TfidfV1(Pipeline):
             ('tfid', TfidfTransformer(**self.preproc_config_TfidfVect))
         ]
         Pipeline.__init__(self, self.steps)
+        logger.info('class:TfidfV1')
 
     def get_voc(self):
         countvect_pos = [k for k, _ in self.steps].index('count') 
@@ -115,6 +120,7 @@ class BOW_Stemming(Pipeline):
             ('count', StemmedCountVectorizer())
         ]
         Pipeline.__init__(self, steps)
+        logger.info('class:BOW_Stemming')
 
     def get_voc(self):
         countvect_pos = [k for k, _ in self.steps].index('count') 
@@ -130,6 +136,7 @@ class TfidfStemming(Pipeline):
             ('tfidStem', StemmedTfidfVectorizer())
         ]
         Pipeline.__init__(self, steps)
+        logger.info('class:TfidfStemming')
 
     def get_voc(self):
         return self.steps[2][1].vocabulary_
@@ -167,6 +174,7 @@ class TfidfStemmingV1(Pipeline):
             ('tfidfStem', StemmedTfidfVectorizer(**self.preproc_config_TfidfVect))
         ]
         Pipeline.__init__(self, steps)
+        logger.info('class:TfidfStemmingV1')
 
     def get_voc(self):
         return self.steps[2][1].vocabulary_
