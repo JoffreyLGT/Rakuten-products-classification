@@ -111,24 +111,28 @@ class BOW_Stemming(Pipeline):
         self.name = 'BOW_Stemming'
         steps = [
             ('remove_html', HTMLRemover()),
+            ('remove_num', NumRemover()),
             ('count', StemmedCountVectorizer())
         ]
         Pipeline.__init__(self, steps)
 
     def get_voc(self):
-        return self.steps[1][1].vocabulary_
+        countvect_pos = [k for k, _ in self.steps].index('count') 
+        return self.steps[countvect_pos][1].vocabulary_
+
 
 class TfidfStemming(Pipeline):
     def __init__(self):
         self.name = 'TfidfStemming'
         steps = [
             ('remove_html', HTMLRemover()),
+            ('remove_num', NumRemover()),
             ('tfidStem', StemmedTfidfVectorizer())
         ]
         Pipeline.__init__(self, steps)
 
     def get_voc(self):
-        return self.steps[1][1].vocabulary_
+        return self.steps[2][1].vocabulary_
     
 
 class TfidfStemmingV1(Pipeline):
@@ -159,9 +163,10 @@ class TfidfStemmingV1(Pipeline):
 
         steps = [
             ('remove_html', HTMLRemover()),
+            ('remove_num', NumRemover()),
             ('tfidfStem', StemmedTfidfVectorizer(**self.preproc_config_TfidfVect))
         ]
         Pipeline.__init__(self, steps)
 
     def get_voc(self):
-        return self.steps[1][1].vocabulary_
+        return self.steps[2][1].vocabulary_
