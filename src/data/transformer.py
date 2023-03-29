@@ -7,6 +7,7 @@ from threading import Thread
 import time
 import numpy as np
 import pandas as pd
+import re
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -39,6 +40,28 @@ class HTMLRemover(BaseEstimator, TransformerMixin):
             return X.apply(lambda column: self._parseColumn(column))
 
         return X.apply(lambda column: self._parseValue(column))
+
+
+class NumRemover(BaseEstimator, TransformerMixin):
+    def _parseValue(self, value):
+        if type(value) != str:
+            return value        
+        value = re.sub('\s?([0-9]+)\s?', ' ', value)
+        return value
+
+    def _parseColumn(self, column):
+        return [self._parseValue(value) for value in column]
+
+    def fit(self, X, y=None):
+        # Do nothing, mandatory function for when a model is provided to the pipeline.
+        return self
+
+    def transform(self, X):
+        if type(X) == pd.DataFrame:
+            return X.apply(lambda column: self._parseColumn(column))
+
+        return X.apply(lambda column: self._parseValue(column))
+            
 
 
 class _RakutenHTMLParser(HTMLParser):
