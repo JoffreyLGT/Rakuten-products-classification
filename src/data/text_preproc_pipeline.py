@@ -1,5 +1,6 @@
 import numpy as np
 import pickle
+import time
 
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import TfidfTransformer
@@ -7,34 +8,53 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 import scipy.sparse as sparse
 
+from src.common.setup_logger import logger
+
 class TextPreprocess():
     
     def __init__(self, pipeline):
         self.pipeline = pipeline
 
     def fit(self, data) -> object:
-        return self.pipeline.fit(data)
+        start_time = time.time()
+        _out = self.pipeline.fit(data)
+        logger.info(f'TextPreprocess.fit {data.name} {(time.time() - start_time):.2f} seconds')
+        return _out
 
     def fit_transform(self, data) -> object:
+        start_time = time.time()
+        _out = self.pipeline.fit_transform(data)
+        logger.info(f'TextPreprocess.fit {data.name} {(time.time() - start_time):.2f} seconds')
         return self.pipeline.fit_transform(data)
 
     def transform(self, data) -> np.array:
-        return self.pipeline.transform(data)
+        start_time = time.time()
+        _out = self.pipeline.transform(data)
+        logger.info(f'TextPreprocess.transform {data.name} {(time.time() - start_time):.2f} seconds')
+
+        return _out
 
     def save(self, data, prefix_filename):
+        start_time = time.time()
         data_sparse = sparse.csr_matrix(data)
         file_name = f"{prefix_filename}_{self.pipeline.name}.pkl"
         with open(file_name,'wb') as fp:
             pickle.dump(data_sparse, fp)
+        logger.info(f'TextPreprocess.save {file_name} {(time.time() - start_time):.2f} seconds')
+        return file_name
 
     def get_voc(self):
-        return self.pipeline.get_voc()
+        voc = self.pipeline.get_voc()
+        logger.info(f'TextPreprocess.save_voc size {len(voc)}')
+        return voc
      
     def save_voc(self, prefix_filename):
         voc = self.get_voc()
         file_name = f"{prefix_filename}_{self.pipeline.name}.pkl"
         with open(file_name,'wb') as fp:
             pickle.dump(voc, fp)
+        logger.info(f'TextPreprocess.save_voc {file_name}')
+        return file_name
 
 class TPWithExtraPreproc(TextPreprocess):
     '''
