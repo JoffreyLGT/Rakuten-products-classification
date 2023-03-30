@@ -6,7 +6,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 import nltk
 
-from src.data.transformer import HTMLRemover
+from src.data.transformer import HTMLRemover, NumRemover
 
 try:
     from nltk.corpus import stopwords
@@ -20,12 +20,14 @@ class BagOfWordsDefault(Pipeline):
         self.name = 'BagOfWordsDefault'
         steps = [
             ('remove_html', HTMLRemover()),
+            ('remove_num', NumRemover()),
             ('count', CountVectorizer())
         ]
         Pipeline.__init__(self, steps)
 
     def get_voc(self):
-        return self.steps[1][1].vocabulary_
+        countvect_pos = [k for k, _ in self.steps].index('count') 
+        return self.steps[countvect_pos][1].vocabulary_
 
 
 class TfidfDefault(Pipeline):
@@ -33,13 +35,15 @@ class TfidfDefault(Pipeline):
         self.name = 'TfidfDefault'
         steps = [
             ('remove_html', HTMLRemover()),
+            ('remove_num', NumRemover()),
             ('count', CountVectorizer()),
             ('tfid', TfidfTransformer())
         ]
         Pipeline.__init__(self, steps)
 
     def get_voc(self):
-        return self.steps[1][1].vocabulary_
+        countvect_pos = [k for k, _ in self.steps].index('count') 
+        return self.steps[countvect_pos][1].vocabulary_
 
 
 class TfidfV1(Pipeline):
@@ -70,12 +74,14 @@ class TfidfV1(Pipeline):
             'sublinear_tf': False
         }
 
-        steps = [
+        self.steps = [
             ('remove_html', HTMLRemover()),
+            ('remove_num', NumRemover()),
             ('count', CountVectorizer(**self.preproc_config_CountVect)),
             ('tfid', TfidfTransformer(**self.preproc_config_TfidfVect))
         ]
-        Pipeline.__init__(self, steps)
+        Pipeline.__init__(self, self.steps)
 
     def get_voc(self):
-        return self.steps[1][1].vocabulary_
+        countvect_pos = [k for k, _ in self.steps].index('count') 
+        return self.steps[countvect_pos][1].vocabulary_

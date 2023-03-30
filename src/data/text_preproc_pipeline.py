@@ -27,9 +27,11 @@ class TextPreprocess():
         with open(file_name,'wb') as fp:
             pickle.dump(data_sparse, fp)
 
+    def get_voc(self):
+        return self.pipeline.get_voc()
+     
     def save_voc(self, prefix_filename):
-        voc = self.pipeline.get_voc()
-        print(voc)
+        voc = self.get_voc()
         file_name = f"{prefix_filename}_{self.pipeline.name}.pkl"
         with open(file_name,'wb') as fp:
             pickle.dump(voc, fp)
