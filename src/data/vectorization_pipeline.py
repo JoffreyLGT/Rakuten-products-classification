@@ -17,7 +17,7 @@ except:
 
 from nltk.stem.snowball import SnowballStemmer
 
-from src.commun.setup_logger import logger
+from src.common.setup_logger import logger
 
 class BagOfWordsDefault(Pipeline):
     def __init__(self):

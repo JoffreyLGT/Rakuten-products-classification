@@ -8,7 +8,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 import scipy.sparse as sparse
 
-from src.commun.setup_logger import logger
+from src.common.setup_logger import logger
 
 class TextPreprocess():
     
