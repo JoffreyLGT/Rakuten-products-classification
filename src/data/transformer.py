@@ -10,7 +10,7 @@ import pandas as pd
 import re
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 from src.data.data import get_imgs_filenames, crop_resize_img
 from IPython.display import clear_output
 from PIL import Image
@@ -45,7 +45,7 @@ class HTMLRemover(BaseEstimator, TransformerMixin):
 class NumRemover(BaseEstimator, TransformerMixin):
     def _parseValue(self, value):
         if type(value) != str:
-            return value        
+            return value
         value = re.sub('\s?([0-9]+)\s?', ' ', value)
         return value
 
@@ -61,7 +61,6 @@ class NumRemover(BaseEstimator, TransformerMixin):
             return X.apply(lambda column: self._parseColumn(column))
 
         return X.apply(lambda column: self._parseValue(column))
-            
 
 
 class _RakutenHTMLParser(HTMLParser):
@@ -252,5 +251,5 @@ class ImagePipeline():
 
         self.pipeline = Pipeline(steps=[
             ("ImageTransformer", img_transformer),
-            ("StandardScaler", StandardScaler()),
+            ("MinMaxScaler", MinMaxScaler()),
         ])
