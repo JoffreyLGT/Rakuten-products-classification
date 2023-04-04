@@ -129,13 +129,18 @@ class ImageTransformer(BaseEstimator, TransformerMixin):
         self.output_img_dir = self.get_output_dir()
         self.filenames_queue = Queue()
 
-    def _initiate_crop_resize(self):
+    def _initiate_crop_resize(self, type):
         """
         Private function started by the threads to crop_resize_img.
         """
         while not self.filenames_queue.empty():
-            filename = self.filenames_queue.get()
-            crop_resize_img(filename, self.input_img_dir, self.output_img_dir,
+            filename, prdtypecode = self.filenames_queue.get()
+            output_dir = self.output_img_dir if prdtypecode is None else os.path.join(
+                self.output_img_dir,
+                type,
+                str(prdtypecode))
+            os.makedirs(output_dir, exist_ok=True)
+            crop_resize_img(filename, self.input_img_dir, output_dir,
                             self.width, self.height, self.keep_ratio, self.grayscale)
 
     def _load_images_to_dataframe(self, X,  filenames: list[str]):
@@ -175,28 +180,32 @@ class ImageTransformer(BaseEstimator, TransformerMixin):
         """
         return self
 
-    def transform(self, X):
+    def transform(self, X, y=None, type: str = None):
         """
         Transform the images for each line of X.
         """
+
         existing_files = []
 
         # Check if the output directory for images exists
         if os.path.exists(self.output_img_dir):
             # It does, check its content
-            existing_files = dict.fromkeys(
-                os.listdir(self.output_img_dir))
-        else:
-            # It doesn't, create the directory
-            os.makedirs(self.output_img_dir)
+            existing_files = []
+            for path, subdirs, files in os.walk(self.output_img_dir):
+                for name in files:
+                    existing_files.append(name)
 
         # Create the list of images to import from X
         images_filenames = get_imgs_filenames(
             X["productid"], X["imageid"])
 
         # Remove the images already in the destination folder so we don't have to process them a second time
-        files_to_process = list(filter(lambda value: value != None, [(
-            x if x not in existing_files else None) for x in images_filenames]))
+        if y is None:
+            files_to_process = list(filter(lambda value: value != None, [(
+                (x, None) if x not in existing_files else None) for x in images_filenames]))
+        else:
+            files_to_process = list(filter(lambda value: value != None, [(
+                (x, y) if x not in existing_files else None) for x, y in zip(images_filenames, y)]))
 
         # Update the queue with the list of images to process
         self.filenames_queue.queue = queue.deque(files_to_process)
@@ -204,7 +213,8 @@ class ImageTransformer(BaseEstimator, TransformerMixin):
         # Create the threads and start them
         threads = []
         for i in range(self.nb_threads):
-            threads.append(Thread(target=self._initiate_crop_resize))
+            threads.append(
+                Thread(target=self._initiate_crop_resize, args={type: type}))
         for thread in threads:
             thread.start()
 
@@ -237,10 +247,31 @@ class ImageTransformer(BaseEstimator, TransformerMixin):
         # Inform the user
         progress.done()
 
-        return self._load_images_to_dataframe(X, images_filenames)
+        if y is None:
+            return self._load_images_to_dataframe(X, images_filenames)
+        else:
+            return X
 
 
 class ImagePipeline():
+
+    def __init__(self, width: int, height: int, keep_ratio: bool, grayscale: bool, input_img_dir: str = "data/images/image_train/", nb_threads: int = 4) -> None:
+
+        self.img_transformer = ImageTransformer(width, height,
+                                                keep_ratio, grayscale, input_img_dir, nb_threads)
+
+        self.output_dir = self.img_transformer.output_img_dir
+
+        self.pipeline = Pipeline(steps=[
+            ("ImageTransformer", self.img_transformer),
+            # ("MinMaxScaler", MinMaxScaler()),
+        ])
+
+
+class AdvancedImagePipeline():
+    """
+    Version of ImagePipeline made for deep learning models
+    """
 
     def __init__(self, width: int, height: int, keep_ratio: bool, grayscale: bool, input_img_dir: str = "data/images/image_train/", nb_threads: int = 4) -> None:
 
@@ -251,5 +282,5 @@ class ImagePipeline():
 
         self.pipeline = Pipeline(steps=[
             ("ImageTransformer", img_transformer),
-            ("MinMaxScaler", MinMaxScaler()),
+            # ("MinMaxScaler", MinMaxScaler()),
         ])
