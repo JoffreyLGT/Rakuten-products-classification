@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 from src.data.analysis import get_img_name
@@ -72,6 +73,7 @@ def crop_resize_img(filename: str, imput_img_dir: str, output_img_dir: str, widt
         new_img_array = img_array[top_line:-bottom_line,
                                   left_line:-right_line,
                                   :]
+
     new_img = Image.fromarray(new_img_array)
 
     if keep_ratio:
@@ -94,3 +96,22 @@ def crop_resize_img(filename: str, imput_img_dir: str, output_img_dir: str, widt
         new_img = ImageOps.grayscale(new_img)
 
     new_img.save(f"{output_img_dir}/{filename}")
+
+
+def get_output_dir(width: int, height: int, keep_ratio: bool, grayscale: bool, type: str):
+    result = f"cropped_w{width}_h{height}"
+    if keep_ratio:
+        result += "_ratio"
+    else:
+        result += "_stretched"
+    if grayscale:
+        result += "_graycaled"
+    else:
+        result += "_colors"
+
+    return os.path.join("data", "images", result, type)
+
+
+def get_img_full_path(width: int, height: int, keep_ratio: bool, grayscale: bool, type: str, prdtypecode: int, filename: str):
+    output_dir = get_output_dir(width, height, keep_ratio, grayscale, type)
+    return os.path.join("data", "images", type, output_dir, prdtypecode, filename)
