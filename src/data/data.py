@@ -32,19 +32,17 @@ def get_imgs_filenames(productids: list[int], imageids: list[int]) -> list[str]:
     return [get_img_name(productid, imageid) for productid, imageid in zip(productids, imageids)]
 
 
-def crop_resize_img(filename: str, imput_img_dir: str, output_img_dir: str, width: int, height: int, keep_ratio: bool, grayscale: bool = False) -> None:
+def remove_white_stripes(img_array: np.ndarray) -> np.ndarray:
     """
-    Crop, resize and apply a grayscale filter to the image.
+    Analyse each lines and column of the array to remove the outer white stripes they might contain.
 
     Arguments:
-    - filename - str: name of the image to process. Must contain the extension.
-    - input_img_dir - str: directory containing the image.
-    - output_img_dir - str: directory to save the processed image in.
-    - width, height - int: width and height of the processed image.
-    - keep_ratio - bool: True to keep the image ratio and eventualy add some white stripes around to fill empty space. False to stretch the image.
-    - grayscale - bool: True to remove the colors and set them as grayscale.
+    - img_array: imaged loaded into a np.ndarray.
+    Returns:
+    - The same array without the outer white stripes.
+    Example:
+    - remove_white_stripes(np.asarray(Image.open("my_image.png")))
     """
-    img_array = np.asarray(Image.open(imput_img_dir + filename))
     top_line = -1
     right_line = -1
     bottom_line = -1
@@ -68,12 +66,29 @@ def crop_resize_img(filename: str, imput_img_dir: str, output_img_dir: str, widt
 
     if (top_line == -1 or bottom_line == -1
        or left_line == -1 or right_line == -1):
-        new_img_array = img_array
+        return img_array
     else:
-        new_img_array = img_array[top_line:-bottom_line,
-                                  left_line:-right_line,
-                                  :]
+        return img_array[top_line:-bottom_line,
+                         left_line:-right_line,
+                         :]
 
+
+def crop_resize_img(filename: str, imput_img_dir: str, output_img_dir: str, width: int, height: int, keep_ratio: bool, grayscale: bool = False) -> None:
+    """
+    Crop, resize and apply a grayscale filter to the image.
+
+    Arguments:
+    - filename - str: name of the image to process. Must contain the extension.
+    - input_img_dir - str: directory containing the image.
+    - output_img_dir - str: directory to save the processed image in.
+    - width, height - int: width and height of the processed image.
+    - keep_ratio - bool: True to keep the image ratio and eventualy add some white stripes around to fill empty space. False to stretch the image.
+    - grayscale - bool: True to remove the colors and set them as grayscale.
+    """
+
+    # Remove the outer white stripes from the image
+    img_array = np.asarray(Image.open(imput_img_dir + filename))
+    new_img_array = remove_white_stripes(img_array)
     new_img = Image.fromarray(new_img_array)
 
     if keep_ratio:
