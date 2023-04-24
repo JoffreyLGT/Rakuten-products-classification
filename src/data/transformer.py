@@ -113,7 +113,7 @@ class Progression():
         print("Avancement : 100%")
 
 
-class ImageCleaner():
+class ImageTransformer(BaseEstimator, TransformerMixin):
     """
     Transform images by first cropping the white stripes and then resize them either while keeping their original ratio or by stretching them. Can also set it to grayscale.
     """
@@ -174,7 +174,13 @@ class ImageCleaner():
             result += "_colors"
         return result
 
-    def generate(self, X, y=None, type: str = None):
+    def fit(self, X=None, y=None):
+        """
+        Doesn't do anything in this scenario, but must be here for Pipeline compatibility.
+        """
+        return self
+
+    def transform(self, X, y=None, type: str = None):
         """
         Transform the images for each line of X.
         """
@@ -251,8 +257,8 @@ class ImagePipeline():
 
     def __init__(self, width: int, height: int, keep_ratio: bool, grayscale: bool, input_img_dir: str = "data/images/image_train/", nb_threads: int = 4) -> None:
 
-        self.img_transformer = ImageCleaner(width, height,
-                                            keep_ratio, grayscale, input_img_dir, nb_threads)
+        self.img_transformer = ImageTransformer(width, height,
+                                                keep_ratio, grayscale, input_img_dir, nb_threads)
 
         self.output_dir = self.img_transformer.output_img_dir
 
@@ -269,8 +275,8 @@ class AdvancedImagePipeline():
 
     def __init__(self, width: int, height: int, keep_ratio: bool, grayscale: bool, input_img_dir: str = "data/images/image_train/", nb_threads: int = 4) -> None:
 
-        img_transformer = ImageCleaner(width, height,
-                                       keep_ratio, grayscale, input_img_dir, nb_threads)
+        img_transformer = ImageTransformer(width, height,
+                                           keep_ratio, grayscale, input_img_dir, nb_threads)
 
         self.output_dir = img_transformer.output_img_dir
 
