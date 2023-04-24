@@ -15,21 +15,24 @@ def load_data(datadir: str = "data") -> pd.DataFrame:
         axis=1)
 
 
-def get_imgs_filenames(productids: list[int], imageids: list[int]) -> list[str]:
+def get_imgs_filenames(productids: list[int], imageids: list[int], folder: str = None) -> list[str]:
     """
     Return a list of filenames from productids and imagesids.
 
     Arguments:
     - productids: list of product ids
     - imageids: list of image ids
+    - folder: folder containing the images. Used only to return a full path.
 
     Return:
     A list of the same size as productids and imageids containing the filenames.
     """
     if (len(productids) != len(imageids)):
         raise ValueError("productids and imageids should be the same size")
-
-    return [get_img_name(productid, imageid) for productid, imageid in zip(productids, imageids)]
+    if (folder == None):
+        return [get_img_name(productid, imageid) for productid, imageid in zip(productids, imageids)]
+    else:
+        return [os.path.join(folder, get_img_name(productid, imageid)) for productid, imageid in zip(productids, imageids)]
 
 
 def remove_white_stripes(img_array: np.ndarray) -> np.ndarray:
