@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from src.data.analysis import get_img_name
 from PIL import Image, ImageOps
+import tensorflow as tf
 
 
 def load_data(datadir: str = "data") -> pd.DataFrame:
@@ -15,36 +16,37 @@ def load_data(datadir: str = "data") -> pd.DataFrame:
         axis=1)
 
 
-def get_imgs_filenames(productids: list[int], imageids: list[int]) -> list[str]:
+def get_imgs_filenames(productids: list[int], imageids: list[int], folder: str = None) -> list[str]:
     """
     Return a list of filenames from productids and imagesids.
 
     Arguments:
     - productids: list of product ids
     - imageids: list of image ids
+    - folder: folder containing the images. Used only to return a full path.
 
     Return:
     A list of the same size as productids and imageids containing the filenames.
     """
     if (len(productids) != len(imageids)):
         raise ValueError("productids and imageids should be the same size")
+    if (folder == None):
+        return [get_img_name(productid, imageid) for productid, imageid in zip(productids, imageids)]
+    else:
+        return [os.path.join(folder, get_img_name(productid, imageid)) for productid, imageid in zip(productids, imageids)]
 
-    return [get_img_name(productid, imageid) for productid, imageid in zip(productids, imageids)]
 
-
-def crop_resize_img(filename: str, imput_img_dir: str, output_img_dir: str, width: int, height: int, keep_ratio: bool, grayscale: bool = False) -> None:
+def remove_white_stripes(img_array: np.ndarray) -> np.ndarray:
     """
-    Crop, resize and apply a grayscale filter to the image.
+    Analyse each lines and column of the array to remove the outer white stripes they might contain.
 
     Arguments:
-    - filename - str: name of the image to process. Must contain the extension.
-    - input_img_dir - str: directory containing the image.
-    - output_img_dir - str: directory to save the processed image in.
-    - width, height - int: width and height of the processed image.
-    - keep_ratio - bool: True to keep the image ratio and eventualy add some white stripes around to fill empty space. False to stretch the image.
-    - grayscale - bool: True to remove the colors and set them as grayscale.
+    - img_array: imaged loaded into a np.ndarray.
+    Returns:
+    - The same array without the outer white stripes.
+    Example:
+    - remove_white_stripes(np.asarray(Image.open("my_image.png")))
     """
-    img_array = np.asarray(Image.open(imput_img_dir + filename))
     top_line = -1
     right_line = -1
     bottom_line = -1
@@ -68,12 +70,29 @@ def crop_resize_img(filename: str, imput_img_dir: str, output_img_dir: str, widt
 
     if (top_line == -1 or bottom_line == -1
        or left_line == -1 or right_line == -1):
-        new_img_array = img_array
+        return img_array
     else:
-        new_img_array = img_array[top_line:-bottom_line,
-                                  left_line:-right_line,
-                                  :]
+        return img_array[top_line:-bottom_line,
+                         left_line:-right_line,
+                         :]
 
+
+def crop_resize_img(filename: str, imput_img_dir: str, output_img_dir: str, width: int, height: int, keep_ratio: bool, grayscale: bool = False) -> None:
+    """
+    Crop, resize and apply a grayscale filter to the image.
+
+    Arguments:
+    - filename - str: name of the image to process. Must contain the extension.
+    - input_img_dir - str: directory containing the image.
+    - output_img_dir - str: directory to save the processed image in.
+    - width, height - int: width and height of the processed image.
+    - keep_ratio - bool: True to keep the image ratio and eventualy add some white stripes around to fill empty space. False to stretch the image.
+    - grayscale - bool: True to remove the colors and set them as grayscale.
+    """
+
+    # Remove the outer white stripes from the image
+    img_array = np.asarray(Image.open(imput_img_dir + filename))
+    new_img_array = remove_white_stripes(img_array)
     new_img = Image.fromarray(new_img_array)
 
     if keep_ratio:
@@ -115,3 +134,89 @@ def get_output_dir(width: int, height: int, keep_ratio: bool, grayscale: bool, t
 def get_img_full_path(width: int, height: int, keep_ratio: bool, grayscale: bool, type: str, prdtypecode: int, filename: str):
     output_dir = get_output_dir(width, height, keep_ratio, grayscale, type)
     return os.path.join("data", "images", type, output_dir, prdtypecode, filename)
+
+
+def convert_sparse_matrix_to_sparse_tensor(X):
+    """
+    Convert sparse matrix to sparce tensor.
+
+    Arguments:
+    - X: sparse matrix to convert.
+
+    Returns:
+    - X matrix converted to sparse tensor.
+    """
+    coo = X.tocoo()
+    indices = np.mat([coo.row, coo.col]).transpose()
+    return tf.sparse.reorder(tf.SparseTensor(indices, coo.data, coo.shape))
+
+
+PRDTYPECODE_DIC = {10: 0,
+                   1140: 1,
+                   1160: 2,
+                   1180: 3,
+                   1280: 4,
+                   1281: 5,
+                   1300: 6,
+                   1301: 7,
+                   1302: 8,
+                   1320: 9,
+                   1560: 10,
+                   1920: 11,
+                   1940: 12,
+                   2060: 13,
+                   2220: 14,
+                   2280: 15,
+                   2403: 16,
+                   2462: 17,
+                   2522: 18,
+                   2582: 19,
+                   2583: 20,
+                   2585: 21,
+                   2705: 22,
+                   2905: 23,
+                   40: 24,
+                   50: 25,
+                   60: 26}
+
+
+def to_simplified_prdtypecode(y: np.array):
+    """
+    Convert the prdtypecode into a simplified equivalent ranging from 0 to 26.
+
+    Arguments:
+    - y: list of prdtypecode to convert to a simplified range.
+
+    Returns:
+    - y with converted prdtypecode.
+    """
+    return np.array([PRDTYPECODE_DIC[i] for i in y])
+
+
+def to_normal_prdtypecode(y: np.array):
+    """
+    Convert back a simplified prdtypecode (ranging from 0 to 26) to the original prdtypecode.
+
+    Arguments:
+    - y: list of prdtypecode to convert to a the original value.
+
+    Returns:
+    - y with original prdtypecode.
+    """
+    return np.array([list(PRDTYPECODE_DIC.keys())[list(PRDTYPECODE_DIC.values()).index(i)] for i in y])
+
+
+def get_model_prediction(y_pred):
+    """
+    Get normal prdtypecode from a model prediction returning the probabilities of each prdtypecode.
+
+    Arguments:
+    - y: list of predictions for each prdtypecode.
+
+    Returns:
+    - a list containing the original prdtypecode with the highest probability.
+    """
+    list_decision = []
+    for y in y_pred:
+        list_decision.append(np.argmax(y))
+    return np.array(to_normal_prdtypecode(list_decision))
