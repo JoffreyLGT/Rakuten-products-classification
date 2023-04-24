@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from src.data.analysis import get_img_name
 from PIL import Image, ImageOps
+import tensorflow as tf
 
 
 def load_data(datadir: str = "data") -> pd.DataFrame:
@@ -133,3 +134,89 @@ def get_output_dir(width: int, height: int, keep_ratio: bool, grayscale: bool, t
 def get_img_full_path(width: int, height: int, keep_ratio: bool, grayscale: bool, type: str, prdtypecode: int, filename: str):
     output_dir = get_output_dir(width, height, keep_ratio, grayscale, type)
     return os.path.join("data", "images", type, output_dir, prdtypecode, filename)
+
+
+def convert_sparse_matrix_to_sparse_tensor(X):
+    """
+    Convert sparse matrix to sparce tensor.
+
+    Arguments:
+    - X: sparse matrix to convert.
+
+    Returns:
+    - X matrix converted to sparse tensor.
+    """
+    coo = X.tocoo()
+    indices = np.mat([coo.row, coo.col]).transpose()
+    return tf.sparse.reorder(tf.SparseTensor(indices, coo.data, coo.shape))
+
+
+PRDTYPECODE_DIC = {10: 0,
+                   1140: 1,
+                   1160: 2,
+                   1180: 3,
+                   1280: 4,
+                   1281: 5,
+                   1300: 6,
+                   1301: 7,
+                   1302: 8,
+                   1320: 9,
+                   1560: 10,
+                   1920: 11,
+                   1940: 12,
+                   2060: 13,
+                   2220: 14,
+                   2280: 15,
+                   2403: 16,
+                   2462: 17,
+                   2522: 18,
+                   2582: 19,
+                   2583: 20,
+                   2585: 21,
+                   2705: 22,
+                   2905: 23,
+                   40: 24,
+                   50: 25,
+                   60: 26}
+
+
+def to_simplified_prdtypecode(y: np.array):
+    """
+    Convert the prdtypecode into a simplified equivalent ranging from 0 to 26.
+
+    Arguments:
+    - y: list of prdtypecode to convert to a simplified range.
+
+    Returns:
+    - y with converted prdtypecode.
+    """
+    return np.array([PRDTYPECODE_DIC[i] for i in y])
+
+
+def to_normal_prdtypecode(y: np.array):
+    """
+    Convert back a simplified prdtypecode (ranging from 0 to 26) to the original prdtypecode.
+
+    Arguments:
+    - y: list of prdtypecode to convert to a the original value.
+
+    Returns:
+    - y with original prdtypecode.
+    """
+    return np.array([list(PRDTYPECODE_DIC.keys())[list(PRDTYPECODE_DIC.values()).index(i)] for i in y])
+
+
+def get_model_prediction(y_pred):
+    """
+    Get normal prdtypecode from a model prediction returning the probabilities of each prdtypecode.
+
+    Arguments:
+    - y: list of predictions for each prdtypecode.
+
+    Returns:
+    - a list containing the original prdtypecode with the highest probability.
+    """
+    list_decision = []
+    for y in y_pred:
+        list_decision.append(np.argmax(y))
+    return np.array(to_normal_prdtypecode(list_decision))
