@@ -220,3 +220,17 @@ def get_model_prediction(y_pred):
     for y in y_pred:
         list_decision.append(np.argmax(y))
     return np.array(to_normal_prdtypecode(list_decision))
+
+def open_resize_img(filename: str, y) -> None:
+    """
+    Open image using the filename and return a resized version of it ready for the image model.
+
+    Argument:
+    - filename: complete path to image file including the extension.
+
+    Return:
+    - Image matrix in a tensor.
+    """
+    img = tf.io.read_file(filename)
+    img = tf.io.decode_jpeg(img, channels=3)
+    return (tf.image.resize(img, [224, 224]), y)

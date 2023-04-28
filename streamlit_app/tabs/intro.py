@@ -1,31 +1,37 @@
 import streamlit as st
+import requests
+from streamlit_lottie import st_lottie
 
 
-title = "My Awesome DataScientest project."
 sidebar_name = "Introduction"
 
+def load_lottieurl(url):
+    """
+    Fetch lottie anymation from URL
+    """
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    return r.json()
+
+# lottie_ai = load_lottieurl("https://assets10.lottiefiles.com/packages/lf20_zrqthn6o.json")
+lottie_ai = load_lottieurl("https://assets6.lottiefiles.com/packages/lf20_rwqo4knz.json")
 
 def run():
+    st_lottie(lottie_ai, height=150)   
 
-    # TODO: choose between one of these GIFs
-    # st.image("https://dst-studio-template.s3.eu-west-3.amazonaws.com/1.gif")
-    st.image("https://dst-studio-template.s3.eu-west-3.amazonaws.com/2.gif")
-    # st.image("https://dst-studio-template.s3.eu-west-3.amazonaws.com/3.gif")
-
-    st.title(title)
-
+    st.title("Product Classification for Rakuten")
     st.markdown("---")
 
-    st.markdown(
-        """
-        Here is a bootsrap template for your DataScientest project, built with [Streamlit](https://streamlit.io).
+    st.subheader("🎯 Objective")
+    st.markdown("This project aims to **automatically categorize products** on an e-commerce platform.")
 
-        You can browse streamlit documentation and demos to get some inspiration:
-        - Check out [streamlit.io](https://streamlit.io)
-        - Jump into streamlit [documentation](https://docs.streamlit.io)
-        - Use a neural net to [analyze the Udacity Self-driving Car Image
-          Dataset] (https://github.com/streamlit/demo-self-driving)
-        - Explore a [New York City rideshare dataset]
-          (https://github.com/streamlit/demo-uber-nyc-pickups)
-        """
-    )
+    st.subheader("📄 Context")
+    st.markdown("""**E-commerce** is a competitive market with multiple giant contenders: **Rakuten**, Amazon, CDiscount etc.
+They have two types of clients: merchants selling their products on the platform and customers buying them.
+
+In order to provide the best user experience, platforms must provide easy to use interfaces and features to make the selling and buying process as easy as possible :
+- A **merchant** should be able to submit their product to sell with guided interface to **maximize their chances to sell** them.
+- **Customers** looking for product should be able to find the **product** they are **looking for**, but should also be suggested products that **might interest them**.
+
+This can only be done with **:red[good product classification]**. This is why we are going to use **Artificial Intelligence** to help sellers to categorize their products.""")
