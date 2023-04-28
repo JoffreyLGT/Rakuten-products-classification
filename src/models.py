@@ -9,9 +9,12 @@ from src.data.text_preproc_pipeline import TextPreprocess
 from src.data.vectorization_pipeline import TfidfStemming
 
 PICKLES_DIR = os.path.join("../data", "pickles")
+MODELS_DIR = os.path.join("../data", "models")
+
 
 def preprocess_image(img):
     return (tf.image.resize(img, [224, 224]))
+
 
 def predict_prdtypecode(designation: str, description: str, image: np.array):
     # Load TextPreprocessor already fitted on training data
@@ -20,23 +23,21 @@ def predict_prdtypecode(designation: str, description: str, image: np.array):
 
     # Load text model
     text_model = keras.models.load_model(
-        os.path.join("../data", "models", "mlp_model_v2", "mlp_model_v2.1.h5"), compile=False)
+        os.path.join(MODELS_DIR, "mlp_model_v2.1.h5"), compile=False)
     text_model_wo_head = tf.keras.Model(
         inputs=text_model.inputs,
         outputs=text_model.layers[-2].output)
 
     # Load image model
     image_model = keras.models.load_model(
-        os.path.join("../data", "models", "cnn_mobilenetv2_keras",
-                     "cnn_mobilenetv2.h5"),
+        os.path.join(MODELS_DIR, "cnn_mobilenetv2.h5"),
         compile=False)
     image_model_wo_head = tf.keras.Model(inputs=image_model.inputs,
                                          outputs=image_model.layers[-2].output)
-    
+
     # Load fusion model
     fusion_model = keras.models.load_model(
-        os.path.join("../data", "models", "fusion_text_image_keras",
-                    "fusion_text_image_keras.h5" ))
+        os.path.join(MODELS_DIR, "fusion_text_image_keras.h5"))
 
     # Data preprocessing
     feats = pd.Series(f"{designation} {description}")
@@ -47,13 +48,15 @@ def predict_prdtypecode(designation: str, description: str, image: np.array):
         convert_sparse_matrix_to_sparse_tensor(feats_processed))
 
     # Predict prdtypecode on image model
-    img_dataset = tf.data.Dataset.from_tensor_slices([image]).map(preprocess_image).batch(1)
+    img_dataset = tf.data.Dataset.from_tensor_slices(
+        [image]).map(preprocess_image).batch(1)
     image_predictions = image_model_wo_head.predict(img_dataset)
 
     # Concatenate both results
     concat_predictions = np.concatenate(
-    (text_predictions, image_predictions), axis=1)
+        (text_predictions, image_predictions), axis=1)
 
-    fusion_dataset = tf.data.Dataset.from_tensor_slices(concat_predictions).batch(1)
+    fusion_dataset = tf.data.Dataset.from_tensor_slices(
+        concat_predictions).batch(1)
     y_pred = fusion_model.predict(fusion_dataset)
     return get_model_prediction(y_pred)[0]
