@@ -263,3 +263,11 @@ CATEGORIES_DIC = {10: "Livre",
                    40: "Jeu vidéo - Jeu",
                    50: "Jeu vidéo - Accessoire",
                    60: "Jeu vidéo - Console"}
+
+DATA_SAMPLE = [
+    ["Christmas decoration", "Décor De Noël Ornement Led Lumières Cerfs Panier Lumineux Maison En Bois Fenêtre Mall", "Décor De Noël Ornement Led Lumières Cerfs Panier Lumineux Maison En Bois Fenêtre Mall", "assets/image_1257660878_product_3881422405.jpg"],
+    ["English manual", "Exploring English Level 2 Teacher's Resource Manual", "", "assets/image_859609154_product_93575721.jpg"],
+    ["Start Wars figurine", "Figurine - Star Wars - Stormtrooper - 30th", "", "assets/image_835089072_product_68594029.jpg"],
+    ["Pool", "Intex - 57495fr - Jeu D'eau Et De Plage - Piscine Carré - Hublot", "Longeur: 549 cm Largeur: 30 cm Descriptif produit: Piscine carrée hublot 229x229x56cm.Larges parois fenêtres transparentes sur les ctés.Capacité : 1215 litres environ Nécessite des piles: Non Modèle : 57495E", "assets/image_898066724_product_144402962.jpg"],
+    ["Console NES", "Nintendo Nes 2 Manettes Et Mario Bros", "", "assets/image_1124990133_product_2086705884.jpg"]
+]

@@ -4,9 +4,7 @@ import pandas as pd
 import numpy as np
 from tensorflow import keras
 import tensorflow as tf
-from src.data.data import convert_sparse_matrix_to_sparse_tensor, get_model_prediction, open_resize_img
-from src.data.text_preproc_pipeline import TextPreprocess
-from src.data.vectorization_pipeline import TfidfStemming
+from src.data.data import PRDTYPECODE_DIC, convert_sparse_matrix_to_sparse_tensor 
 
 PICKLES_DIR = os.path.join("../data", "pickles")
 MODELS_DIR = os.path.join("../data", "models")
@@ -59,4 +57,25 @@ def predict_prdtypecode(designation: str, description: str, image: np.array):
     fusion_dataset = tf.data.Dataset.from_tensor_slices(
         concat_predictions).batch(1)
     y_pred = fusion_model.predict(fusion_dataset)
-    return get_model_prediction(y_pred)[0]
+    return get_prdtypecode_probabilities(y_pred)
+
+def get_prdtypecode_probabilities(y_pred):
+    """
+    Get the probabilities for each categories from the predictions.
+
+    Argument:
+    - y_pred: predictions from the model
+
+    Returns:
+    - a list of [prdtypecode, probability in percent] sorted descending
+    """
+    list_decisions = []
+    for y in y_pred:
+        list_probabilities = []
+        for i, probability in enumerate(y):
+            list_probabilities.append([list(PRDTYPECODE_DIC.keys())[i],
+                                       np.round(probability*100,2)])
+        list_decisions.append(sorted(list_probabilities, 
+                  key=lambda x:x[1],
+                  reverse=True))
+    return list_decisions
