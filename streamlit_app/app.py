@@ -1,11 +1,9 @@
 from collections import OrderedDict
-
 import streamlit as st
-
 import config
-
-# TODO : you can (and should) rename and add tabs in the ./tabs folder, and import them here.
-from tabs import intro_tab, categories_tab, third_tab, prediction_tab
+from tabs import intro_tab, categories_tab, dataviz_tab, prediction_tab
+import sys
+sys.path.append('../')
 
 
 st.set_page_config(
@@ -26,7 +24,7 @@ TABS = OrderedDict(
     [
         (intro_tab.sidebar_name, intro_tab),
         (categories_tab.sidebar_name, categories_tab),
-        (third_tab.sidebar_name, third_tab),
+#        (dataviz_tab.sidebar_name, dataviz_tab),
         (prediction_tab.sidebar_name, prediction_tab),
     ]
 )

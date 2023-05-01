@@ -202,7 +202,11 @@ def img_with_white_stripes(nb_pixels: int, datadir: str, img_filenames: pd.Serie
     clear_output(wait=True)
     return result
 
-# Debug, will be removed in the next commit
-# datadir = "data"
-# df = data.load_data(datadir)
-# df_image = get_img_information(datadir)
+TEXT_DATA_DESCRIPTION = [
+    ["Name", "Category", "Data type", "Description"],
+    ["designation", "Feat", "str", "Product title, short description"],
+    ["description", "Feat", "str", "Product long description"],
+    ["productid", "Info", "int", "Product unique identifier"],
+    ["imageid", "Info", "int", "Main product image unique identifier"],
+    ["prdtypecode", "Target", "int", "Product category unique identifier"]
+]
