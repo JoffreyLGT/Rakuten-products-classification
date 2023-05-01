@@ -2,16 +2,15 @@ from collections import OrderedDict
 
 import streamlit as st
 
-# TODO : change TITLE, TEAM_MEMBERS and PROMOTION values in config.py.
 import config
 
 # TODO : you can (and should) rename and add tabs in the ./tabs folder, and import them here.
-from tabs import intro, second_tab, third_tab
+from tabs import intro_tab, categories_tab, third_tab, prediction_tab
 
 
 st.set_page_config(
     page_title=config.TITLE,
-    page_icon="https://datascientest.com/wp-content/uploads/2020/03/cropped-favicon-datascientest-1-32x32.png",
+    page_icon="https://img.icons8.com/?size=512&id=48282&format=png",
 )
 
 with open("style.css", "r") as f:
@@ -25,9 +24,10 @@ st.markdown(f"<style>{style}</style>", unsafe_allow_html=True)
 # as value as follow :
 TABS = OrderedDict(
     [
-        (intro.sidebar_name, intro),
-        (second_tab.sidebar_name, second_tab),
+        (intro_tab.sidebar_name, intro_tab),
+        (categories_tab.sidebar_name, categories_tab),
         (third_tab.sidebar_name, third_tab),
+        (prediction_tab.sidebar_name, prediction_tab),
     ]
 )
 

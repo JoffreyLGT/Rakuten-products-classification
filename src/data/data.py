@@ -220,3 +220,46 @@ def get_model_prediction(y_pred):
     for y in y_pred:
         list_decision.append(np.argmax(y))
     return np.array(to_normal_prdtypecode(list_decision))
+
+def open_resize_img(filename: str, y) -> None:
+    """
+    Open image using the filename and return a resized version of it ready for the image model.
+
+    Argument:
+    - filename: complete path to image file including the extension.
+
+    Return:
+    - Image matrix in a tensor.
+    """
+    img = tf.io.read_file(filename)
+    img = tf.io.decode_jpeg(img, channels=3)
+    return (tf.image.resize(img, [224, 224]), y)
+
+
+CATEGORIES_DIC = {10: "Livre",
+                   1140: "Figurine",
+                   1160: "Carte à collectionner",
+                   1180: "Univers fantastiques",
+                   1280: "Jouet bébé",
+                   1281: "Jeu de société",
+                   1300: "Minature de collection",
+                   1301: "Loisir",
+                   1302: "Sport sur gazon",
+                   1320: "Accessoire bébé",
+                   1560: "Meuble d'intérieur",
+                   1920: "Litterie, rideaux",
+                   1940: "Epicerie",
+                   2060: "Décoration d'intérieur",
+                   2220: "Accessoire animaux de compagnie",
+                   2280: "Magazine et BD",
+                   2403: "Livres anciens",
+                   2462: "Jeu vidéo - Pack",
+                   2522: "Fourniture de bureau",
+                   2582: "Meubles extérieur",
+                   2583: "Piscine",
+                   2585: "Bricolage",
+                   2705: "Livre",
+                   2905: "Jeu vidéo - Jeu",
+                   40: "Jeu vidéo - Jeu",
+                   50: "Jeu vidéo - Accessoire",
+                   60: "Jeu vidéo - Console"}

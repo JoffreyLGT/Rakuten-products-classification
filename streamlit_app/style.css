@@ -37,20 +37,20 @@ section[data-testid="stSidebar"] > div {
 }
 
 section[data-testid="stSidebar"] button[title="View fullscreen"] {
-  display: none;
+  /* display: none; */
 }
 
 section[data-testid="stSidebar"] button[kind="icon"] {
   display: none;
 }
 
-section[data-testid="stSidebar"] .st-bk {
+/* section[data-testid="stSidebar"] .st-bk {
   background-color: white;
-}
+} */
 
-section[data-testid="stSidebar"] .st-c0 {
+/* section[data-testid="stSidebar"] .st-c0 {
   background-color: black;
-}
+} */
 
 section[data-testid="stSidebar"] hr {
   margin-top: 30px;
@@ -83,3 +83,4 @@ section[tabindex="0"] .block-container {
   padding-top: 0px;
   padding-bottom: 0px;
 }
+9
