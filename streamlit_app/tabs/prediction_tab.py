@@ -38,6 +38,7 @@ def run():
         st.session_state["image"] = ""
 
     st.title(title)
+    st.markdown("---")
     st.warning("Please note that only French language is supported")
     
     with st.expander(label="Predefined examples"):

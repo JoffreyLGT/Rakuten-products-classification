@@ -1,18 +1,11 @@
 import streamlit as st
-import requests
 from streamlit_lottie import st_lottie
+import sys
+sys.path.append('../')
+from src.utils import load_lottieurl
 
 
 sidebar_name = "Introduction"
-
-def load_lottieurl(url):
-    """
-    Fetch lottie anymation from URL
-    """
-    r = requests.get(url)
-    if r.status_code != 200:
-        return None
-    return r.json()
 
 # lottie_ai = load_lottieurl("https://assets10.lottiefiles.com/packages/lf20_zrqthn6o.json")
 lottie_ai = load_lottieurl("https://assets6.lottiefiles.com/packages/lf20_rwqo4knz.json")
