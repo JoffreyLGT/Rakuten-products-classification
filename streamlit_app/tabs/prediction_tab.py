@@ -14,6 +14,7 @@ def set_example():
     st.session_state["designation"] = example[1]
     st.session_state["description"] = example[2]
     st.session_state["image"] = example[3]
+    st.session_state["random"] = ""
 
 def set_image():
     st.session_state["image"] = st.session_state["image_uploader"]
@@ -25,6 +26,8 @@ def set_random_product():
     st.session_state["designation"] = designation
     st.session_state["description"] = description
     st.session_state["image"] = image
+
+    st.session_state["example"] = ""
 
 title = "Predict your item category"
 sidebar_name = title
