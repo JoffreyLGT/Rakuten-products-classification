@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import streamlit as st
 import config
-from tabs import intro_tab, categories_tab, dataviz_tab, prediction_tab, whatsnext_tab
+from tabs import info_tab, categories_tab, dataviz_tab, prediction_tab, whatsnext_tab
 import sys
 sys.path.append('../')
 
@@ -18,7 +18,7 @@ st.markdown(f"<style>{style}</style>", unsafe_allow_html=True)
 
 TABS = OrderedDict(
     [
-        (intro_tab.sidebar_name, intro_tab),
+        (info_tab.sidebar_name, info_tab),
         (categories_tab.sidebar_name, categories_tab),
 #        (dataviz_tab.sidebar_name, dataviz_tab),
         (prediction_tab.sidebar_name, prediction_tab),
