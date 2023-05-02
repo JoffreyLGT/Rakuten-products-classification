@@ -237,14 +237,14 @@ def open_resize_img(filename: str, y) -> None:
 
 
 CATEGORIES_DIC = {10: "Livre",
-                   1140: "Figurine",
+                   1140: "Figurine et produits dérivés",
                    1160: "Carte à collectionner",
                    1180: "Univers fantastiques",
-                   1280: "Jouet bébé",
+                   1280: "Jouet pour enfant",
                    1281: "Jeu de société",
-                   1300: "Minature de collection",
+                   1300: "Miniature de collection",
                    1301: "Loisir",
-                   1302: "Sport sur gazon",
+                   1302: "Activité d'extérieur",
                    1320: "Accessoire bébé",
                    1560: "Meuble d'intérieur",
                    1920: "Litterie, rideaux",
