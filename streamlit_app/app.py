@@ -1,7 +1,7 @@
 from collections import OrderedDict
 import streamlit as st
 import config
-from tabs import intro_tab, categories_tab, dataviz_tab, prediction_tab
+from tabs import intro_tab, categories_tab, dataviz_tab, prediction_tab, whatsnext_tab
 import sys
 sys.path.append('../')
 
@@ -16,16 +16,13 @@ with open("style.css", "r") as f:
 
 st.markdown(f"<style>{style}</style>", unsafe_allow_html=True)
 
-
-# TODO: add new and/or renamed tab in this ordered dict by
-# passing the name in the sidebar as key and the imported tab
-# as value as follow :
 TABS = OrderedDict(
     [
         (intro_tab.sidebar_name, intro_tab),
         (categories_tab.sidebar_name, categories_tab),
 #        (dataviz_tab.sidebar_name, dataviz_tab),
         (prediction_tab.sidebar_name, prediction_tab),
+        (whatsnext_tab.sidebar_name, whatsnext_tab),
     ]
 )
 

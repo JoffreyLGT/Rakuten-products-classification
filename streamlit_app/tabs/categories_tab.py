@@ -12,6 +12,8 @@ sidebar_name = title
 def run():
 
     st.title(title)
+    st.markdown("---")
+
     st.markdown("""
                 Bellow is the list of all the **product type codes** the model can identify and a **label** describing their content.
                 Please keep in mind the label was **:red[set arbitrarily]** by checking images of the category.
