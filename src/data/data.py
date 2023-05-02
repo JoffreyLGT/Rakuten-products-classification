@@ -271,3 +271,22 @@ DATA_SAMPLE = [
     ["Pool", "Intex - 57495fr - Jeu D'eau Et De Plage - Piscine Carré - Hublot", "Longeur: 549 cm Largeur: 30 cm Descriptif produit: Piscine carrée hublot 229x229x56cm.Larges parois fenêtres transparentes sur les ctés.Capacité : 1215 litres environ Nécessite des piles: Non Modèle : 57495E", "assets/image_898066724_product_144402962.jpg"],
     ["Console NES", "Nintendo Nes 2 Manettes Et Mario Bros", "", "assets/image_1124990133_product_2086705884.jpg"]
 ]
+
+
+def get_random_product(prdtypecode, data):
+    """
+    Return a random product with prdtypecode from data.
+
+    Arguments:
+    - prdtypecode: type of the product to return
+    - data: dataframe to use.
+
+    Returns:
+    - tuple with (designation, description, image_path)
+    """
+    product = data[data["prdtypecode"] == prdtypecode].sample(1).iloc[0]
+    image_path = get_imgs_filenames(productids=[product["productid"]],
+                               imageids=[product["imageid"]],
+                               folder="../data/images/image_train")[0]
+    return (product["designation"], product["description"],
+            image_path)

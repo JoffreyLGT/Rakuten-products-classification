@@ -1,10 +1,11 @@
 import numpy as np
 import streamlit as st
 from PIL import Image
+import re
 import sys
 sys.path.append('../')
 from src.models import predict_prdtypecode
-from src.data.data import CATEGORIES_DIC, DATA_SAMPLE
+from src.data.data import CATEGORIES_DIC, DATA_SAMPLE, get_random_product, load_data
 
 
 def set_example():
@@ -17,7 +18,13 @@ def set_example():
 def set_image():
     st.session_state["image"] = st.session_state["image_uploader"]
 
-
+def set_random_product():
+    data = load_data("../data").fillna("")
+    prdtypecode = re.findall("[0-9]*", st.session_state["random"])[0]
+    designation, description, image = get_random_product(int(prdtypecode), data)
+    st.session_state["designation"] = designation
+    st.session_state["description"] = description
+    st.session_state["image"] = image
 
 title = "Predict your item category"
 sidebar_name = title
@@ -31,12 +38,19 @@ def run():
     st.warning("Please note that only French language is supported")
     
     with st.expander(label="Predefined examples"):
-        st.selectbox(label="Select an example from the list",
-                     label_visibility="collapsed",
-                     key="example",
-                     options=["", *[i[0] for i in DATA_SAMPLE]],
-                     on_change=set_example)
+        col_predif, col_random = st.columns([1,1])
+        with col_predif:
+            st.selectbox(label="Example from the list",
+                         key="example",
+                         options=["", *[i[0] for i in DATA_SAMPLE]],
+                         on_change=set_example)
 
+        with col_random:
+            st.selectbox(label="Random example from a category",
+                         key="random",
+                         options=["", *[f"{i} - {CATEGORIES_DIC[i]}" for i in 
+                                    list(CATEGORIES_DIC.keys())]],
+                         on_change=set_random_product)
 
     designation = st.text_input(label="Designation", key="designation")
     description = st.text_area(label="Description", key="description")
