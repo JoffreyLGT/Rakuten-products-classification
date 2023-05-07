@@ -1,5 +1,7 @@
 # Product Classification for Rakuten
 
+*Disclaimer: this project is a follow up of [Fev23_BDS_Rakuten](https://github.com/DataScientest-Studio/Fev23_BDS_Rakuten) originally created with [ha2sunny](https://github.com/ha2sunny) and [lethibichngan](https://github.com/lethibichngan).*
+
 ## 🎯 Objective
 
 This project aims to **automatically categorize products** on an e-commerce platform.
@@ -17,7 +19,7 @@ This can only be done with **good product classification**. This is why we are g
 
 ## 💻 Project's team
 
-This project was developed by the following team :
+This project is currently maintained by Joffrey Lagut. However, it was originally developed by the following team :
 
 - Joffrey Lagut ([GitHub](https://github.com/JoffreyLGT) / [LinkedIn](https://www.linkedin.com/in/joffrey-lagut-9b3b1076/))
 - Heiko Agnoli ([GitHub](https://github.com/ha2sunny) / [LinkedIn](https://www.linkedin.com/in/heikoagnoli/))
